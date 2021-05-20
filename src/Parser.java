@@ -127,16 +127,12 @@ public class Parser {
 	}
 
 	static RobotProgramNode parseLoop(Scanner s) {
-		// THE PARSER GOES HERE
-		while(s.hasNext()){
-			if(s.hasNext(";")){
-				s.next();
+		RobotProgramNode returnNode = null;
+		RobotProgramNode blockN = null;
+		require(loop,"Loop Missing",s);
+		require(OPENBRACE,"Missing '{'", s);
+		while(!s.hasNext(CLOSEBRACE)) {}
 
-			}
-			if(s.hasNext()) {
-				System.out.println(s.next());
-			}
-		}
 
 		return null;
 	}
