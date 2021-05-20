@@ -22,7 +22,10 @@ public class Parser {
 			// the only time tokens can be next to each other is
 			// when one of them is one of (){},;
 			scan.useDelimiter("\\s+|(?=[{}(),;])|(?<=[{}(),;])");
-
+			// prints out program in raw text form
+			while(scan.hasNext()){
+				System.out.println(scan.next());
+			}
 			RobotProgramNode n = parseProgram(scan); // You need to implement this!!!
 
 			scan.close();
@@ -81,9 +84,12 @@ public class Parser {
 	static Pattern CLOSEPAREN = Pattern.compile("\\)");
 	static Pattern OPENBRACE = Pattern.compile("\\{");
 	static Pattern CLOSEBRACE = Pattern.compile("\\}");
-	static Pattern actPat = Pattern.compile("move|turnL|turnR|takeFuel|wait");
+	static Pattern actPat = Pattern.compile("move|turnL|turnR|turnAround|takeFuel|wait|shieldOn|shieldOff");
 	static Pattern semiCol = Pattern.compile(";");
 	static Pattern loop = Pattern.compile("loop");
+	static Pattern SENSOR = Pattern.compile("fuelLeft|oppLR|oppFB|numBarrels|barrelLR|barrelFB|wallDist");
+	static Pattern relOP = Pattern.compile("lt|gt|eq");
+
 
 	/**
 	 * See assignment handout for the grammar.
@@ -107,6 +113,8 @@ public class Parser {
 		if(!s.hasNext()){return null;}
 		if(s.hasNext(actPat)) { returnNode = parseAct(s); }
 		else if (s.hasNext(loop)){ returnNode = parseLoop(s); }
+		else if (s.hasNext("if")){}
+		else if (s.hasNext("while")){}
 		else {fail("Invalid statement", s);}
 
 		return returnNode;
@@ -120,6 +128,9 @@ public class Parser {
 		else if(s.hasNext("turnR")){returnNode = new turnRnode(s);}
 		else if(s.hasNext("takeFuel")){returnNode = new takeFnode(s);}
 		else if(s.hasNext("wait")){returnNode = new waitNode(s);}
+		else if(s.hasNext("turnAround")){returnNode = new turnAnode(s);}
+		else if(s.hasNext("shieldOn")){returnNode = new shieldONnode(s);}
+		else if(s.hasNext("shieldOff")){returnNode = new shieldOFFnode(s);}
 		else {fail("Unknown or missing Act",s);}
 
 		require(semiCol,"Missing ;",s);
@@ -141,11 +152,11 @@ public class Parser {
 	static RobotProgramNode parseBlock(Scanner s) {
 		ArrayList<RobotProgramNode> blockList = new ArrayList<>();
 		require(OPENBRACE,"Missing '{'",s);
-		while(!s.hasNext(CLOSEBRACE)){
+		while(!s.hasNext(CLOSEBRACE) && s.hasNext()){
 			RobotProgramNode statement = parseStmt(s);
 			blockList.add(statement);
 		}
-		require(CLOSEBRACE, "No '}'", s);
+		require(CLOSEBRACE, "Missing '}'", s);
 
 		return new blockNode(blockList);
 	}
