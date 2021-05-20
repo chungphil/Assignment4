@@ -83,47 +83,47 @@ public class Parser {
 	static Pattern CLOSEBRACE = Pattern.compile("\\}");
 	static Pattern actPat = Pattern.compile("move|turnL|turnR|takeFuel|wait");
 	static Pattern semiCol = Pattern.compile(";");
+	static Pattern loop = Pattern.compile("loop");
 
 	/**
 	 * See assignment handout for the grammar.
 	 */
 	static RobotProgramNode parseProgram(Scanner s) {
 		// THE PARSER GOES HERE
+		//Can have 0 to ~ number of statements
+		ArrayList<RobotProgramNode> sumProgram = new ArrayList<>();
 		if(!s.hasNext()){return null;}
 		while(s.hasNext()){
-
+			RobotProgramNode statement = parseStmt(s);
+			sumProgram.add(statement);
 		}
 
-		return null;
+		return new progNode(sumProgram);
 	}
+
 	static RobotProgramNode parseStmt(Scanner s) {
-		// THE PARSER GOES HERE
-		while(s.hasNext()){
-			if(s.hasNext(";")){
-				s.next();
+		RobotProgramNode returnNode = null;
+		//Can be either and Action; or Loop{}
+		if(!s.hasNext()){return null;}
+		if(s.hasNext(actPat)) { returnNode = parseAct(s); }
+		else if (s.hasNext(loop)){ returnNode = parseLoop(s); }
+		else { return null;}
 
-			}
-			if(s.hasNext()) {
-				System.out.println(s.next());
-			}
-		}
-
-		return null;
+		return returnNode;
 	}
 
-	static RobotProgramNode parseAct(Scanner s) {
-		// THE PARSER GOES HERE
-		while(s.hasNext()){
-			if(s.hasNext(";")){
-				s.next();
+	static RobotProgramNode parseAct( Scanner s) {
+		RobotProgramNode returnNode = null;
+		// Need to figure out how to distinguish between different acts and parse as correct node.
+		if(s.hasNext("move")){returnNode = new moveNode(s);}
+		else if(s.hasNext("turnL")){returnNode = new turnLnode(s);}
+		else if(s.hasNext("turnR")){returnNode = new turnRnode(s);}
+		else if(s.hasNext("takeFuel")){returnNode = new takeFnode(s);}
+		else if(s.hasNext("wait")){returnNode = new waitNode(s);}
+		else {fail("Unknown or missing Act",s);}
 
-			}
-			if(s.hasNext()) {
-				System.out.println(s.next());
-			}
-		}
-
-		return null;
+		require(semiCol,"Missing ;",s);
+		return returnNode;
 	}
 
 	static RobotProgramNode parseLoop(Scanner s) {
@@ -155,6 +155,7 @@ public class Parser {
 
 		return null;
 	}
+
 
 	// utility methods for the parser
 
