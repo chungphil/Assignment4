@@ -90,13 +90,18 @@ class ifNode implements RobotProgramNode{
 	private RobotProgramNode condNode;
 	private RobotProgramNode ifBlock;
 
-	public ifNode(){
-
+	public ifNode(RobotProgramNode cond, RobotProgramNode block){
+		this.condNode = cond;
+		this.ifBlock = block;
 	}
 
 	@Override
 	public void execute(Robot robot){
 
+	}
+
+	public String toString(){
+		return "";
 	}
 }
 
@@ -108,6 +113,15 @@ class whileNode implements RobotProgramNode{
 }
 
 class condNode implements RobotProgramNode{
+	private String relop;
+	private RobotProgramNode sensor;
+	private RobotProgramNode number;
+
+	public condNode(String rel, RobotProgramNode sen, RobotProgramNode num){
+		this.relop = rel;
+		this.sensor = sen;
+		this.number = num;
+	}
 
 	@Override
 	public void execute(Robot robot){

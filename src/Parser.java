@@ -161,6 +161,62 @@ public class Parser {
 		return new blockNode(blockList);
 	}
 
+	//parse if loop
+
+	static RobotProgramNode parseIf(Scanner s) {
+		RobotProgramNode returnNode = null;
+		RobotProgramNode condN = null;
+		RobotProgramNode blockN = null;
+
+		require("if","'If' Missing",s);
+		require(OPENPAREN,"Missing '('",s);
+		condN = parseCond(s);
+		require(CLOSEPAREN,"Missing '('",s);
+		blockN = parseBlock(s);
+
+		returnNode = new ifNode(condN,blockN);
+
+		return returnNode;
+	}
+	//parse while loop
+
+	//parse cond
+	static RobotProgramNode parseCond(Scanner s) {
+		String relopN = null;
+		RobotProgramNode senN = null;
+		RobotProgramNode numN = null;
+
+		if(s.hasNext(relOP)){relopN = s.next();}// RELOP
+		else{fail("RelOP missing",s);}
+		require(OPENPAREN,"Missing '('",s);// (
+		if(s.hasNext(SENSOR)){senN = parseSen(s);}// SEN
+		else{fail("Invalid Sensor term",s);}
+		require(",", "Missing ','", s);// ,
+		if(s.hasNextInt()){numN = new numNode(s.nextInt());}// NUM
+		else{fail("Invalid number term",s);}
+		require(CLOSEPAREN, "Missing ')'", s);// )
+
+		return new condNode(relopN,senN,numN);
+	}
+	//parse Sensor
+	static RobotProgramNode parseSen( Scanner s) {
+		RobotProgramNode returnNode = null;
+		// Need to figure out how to distinguish between different acts and parse as correct node.
+		if(s.hasNext("fuelLeft")){returnNode = new fuelLnode(s);}
+		else if(s.hasNext("oppLR")){returnNode = new oppLRnode(s);}
+		else if(s.hasNext("oppFB")){returnNode = new oppFBnode(s);}
+		else if(s.hasNext("numBarrels")){returnNode = new numBnode(s);}
+		else if(s.hasNext("barrelLR")){returnNode = new barLRnode(s);}
+		else if(s.hasNext("barrelFB")){returnNode = new barFBnode(s);}
+		else if(s.hasNext("wallDist")){returnNode = new wallDnode(s);}
+
+		else {fail("Unknown or missing Sensor term",s);}
+
+		return returnNode;
+	}
+	//parse sensor
+
+	//parse num
 
 	// utility methods for the parser
 
