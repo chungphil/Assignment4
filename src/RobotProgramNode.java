@@ -21,6 +21,14 @@ class progNode implements RobotProgramNode{
 			r.execute(robot);
 		}
 	}
+	public String toString(){
+		String returnStr = "";
+		for(RobotProgramNode r: compProgram){
+			returnStr = returnStr + r.toString();
+		}
+		return returnStr;
+	}
+
 }
 
 
@@ -51,6 +59,10 @@ class loopNode implements RobotProgramNode{
 			loopBlock.execute(robot);
 		}
 	}
+
+	public String toString(){
+		return "loop" + loopBlock.toString();
+	}
 }
 
 class blockNode implements RobotProgramNode{
@@ -64,6 +76,13 @@ class blockNode implements RobotProgramNode{
 			r.execute(robot);
 		}
 	}
+	public String toString(){
+		String returnStr = "{";
+		for(RobotProgramNode r: blockL){
+			returnStr = returnStr + r.toString();
+		}
+		return returnStr + "}";
+	}
 }
 
 
@@ -75,6 +94,7 @@ class turnLnode implements RobotProgramNode{
 	public void execute(Robot robot){
 		robot.turnLeft();
 	}
+	public String toString(){ return "turnL;";}
 }
 
 class turnRnode implements RobotProgramNode{
@@ -85,6 +105,7 @@ class turnRnode implements RobotProgramNode{
 	public void execute(Robot robot){
 		robot.turnRight();
 	}
+	public String toString(){ return "turnR;";}
 }
 
 class takeFnode implements RobotProgramNode{
@@ -95,6 +116,7 @@ class takeFnode implements RobotProgramNode{
 	public void execute(Robot robot){
 		robot.takeFuel();
 	}
+	public String toString(){ return "takeFuel;";}
 }
 
 class moveNode implements RobotProgramNode{
@@ -105,6 +127,7 @@ class moveNode implements RobotProgramNode{
 	public void execute(Robot robot){
 		robot.move();
 	}
+	public String toString(){ return "move;";}
 }
 
 class waitNode implements RobotProgramNode{
@@ -115,4 +138,5 @@ class waitNode implements RobotProgramNode{
 	public void execute(Robot robot){
 		robot.idleWait();
 	}
+	public String toString(){ return "wait;";}
 }
