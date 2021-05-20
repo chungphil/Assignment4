@@ -107,7 +107,7 @@ public class Parser {
 		if(!s.hasNext()){return null;}
 		if(s.hasNext(actPat)) { returnNode = parseAct(s); }
 		else if (s.hasNext(loop)){ returnNode = parseLoop(s); }
-		else { return null;}
+		else {fail("Invalid statement", s);}
 
 		return returnNode;
 	}
@@ -130,26 +130,24 @@ public class Parser {
 		RobotProgramNode returnNode = null;
 		RobotProgramNode blockN = null;
 		require(loop,"Loop Missing",s);
-		require(OPENBRACE,"Missing '{'", s);
-		while(!s.hasNext(CLOSEBRACE)) {}
+		//This is parsing a block Node
+		if(s.hasNext(OPENBRACE)){blockN = parseBlock(s);}
+		else {fail("No statements in the loop",s);}
+		returnNode = new loopNode(blockN);
 
-
-		return null;
+		return returnNode;
 	}
 
 	static RobotProgramNode parseBlock(Scanner s) {
-		// THE PARSER GOES HERE
-		while(s.hasNext()){
-			if(s.hasNext(";")){
-				s.next();
-
-			}
-			if(s.hasNext()) {
-				System.out.println(s.next());
-			}
+		ArrayList<RobotProgramNode> blockList = new ArrayList<>();
+		require(OPENBRACE,"Missing '{'",s);
+		while(!s.hasNext(CLOSEBRACE)){
+			RobotProgramNode statement = parseStmt(s);
+			blockList.add(statement);
 		}
+		require(CLOSEBRACE, "No '}'", s);
 
-		return null;
+		return new blockNode(blockList);
 	}
 
 

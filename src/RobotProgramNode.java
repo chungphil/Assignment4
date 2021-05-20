@@ -40,35 +40,32 @@ class actNode implements RobotProgramNode{
 }
 
 class loopNode implements RobotProgramNode{
+	private RobotProgramNode loopBlock;
+
+	public loopNode(RobotProgramNode bN){
+		this.loopBlock = bN;
+	}
 	@Override
 	public void execute(Robot robot){
-
+		while (true){
+			loopBlock.execute(robot);
+		}
 	}
 }
 
 class blockNode implements RobotProgramNode{
+	private ArrayList<RobotProgramNode> blockL;
+	public blockNode(ArrayList<RobotProgramNode> bList){
+		this.blockL = bList;
+	}
 	@Override
-	public void execute(Robot robot){
-
+	public void execute(Robot robot) {
+		for(RobotProgramNode r: blockL){
+			r.execute(robot);
+		}
 	}
 }
 
-//class TurnNode implements RobotProgramNode{
-//	String LR;
-//	public TurnNode(String LR){
-//		this.LR = LR;
-//	}
-//
-//	public void execute(Robot robot) {
-//		if (LR == "L"){
-//			robot.turnLeft();
-//		}
-//		else {
-//			robot.turnRight();
-//		}
-//
-//	}
-//}
 
 class turnLnode implements RobotProgramNode{
 
