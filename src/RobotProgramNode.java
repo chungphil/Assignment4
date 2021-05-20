@@ -8,6 +8,11 @@ import java.util.Scanner;
 
 interface RobotProgramNode {
 	public void execute(Robot robot);
+
+}
+
+abstract class SensorNode implements RobotProgramNode{
+	public int evaluate(Robot robot){return Integer.MIN_VALUE;}
 }
 
 class progNode implements RobotProgramNode{
@@ -21,6 +26,7 @@ class progNode implements RobotProgramNode{
 			r.execute(robot);
 		}
 	}
+
 	public String toString(){
 		String returnStr = "";
 		for(RobotProgramNode r: compProgram){
@@ -34,9 +40,8 @@ class progNode implements RobotProgramNode{
 class stmtNode implements RobotProgramNode{
 
 	@Override
-	public void execute(Robot robot) {
+	public void execute(Robot robot) { }
 
-	}
 }
 
 class actNode implements RobotProgramNode{
@@ -44,6 +49,7 @@ class actNode implements RobotProgramNode{
 	public void execute(Robot robot){
 
 	}
+
 }
 
 class blockNode implements RobotProgramNode{
@@ -64,6 +70,7 @@ class blockNode implements RobotProgramNode{
 		}
 		return returnStr + "}";
 	}
+
 }
 
 // loop, if, while, cond nodes
@@ -84,69 +91,83 @@ class loopNode implements RobotProgramNode{
 	public String toString(){
 		return "loop" + loopBlock.toString();
 	}
+
 }
 
 class ifNode implements RobotProgramNode{
-	private RobotProgramNode condNode;
+	private condNode cNode;
 	private RobotProgramNode ifBlock;
 
-	public ifNode(RobotProgramNode cond, RobotProgramNode block){
-		this.condNode = cond;
+	public ifNode(condNode cond, RobotProgramNode block){
+		this.cNode = cond;
 		this.ifBlock = block;
 	}
 
 	@Override
 	public void execute(Robot robot){
-
+		if(cNode.evaluate(robot)){
+			ifBlock.execute(robot);
+		}
 	}
 
 	public String toString(){
-		return "";
+		return "if"+"("+ cNode.toString()+ ")"+ ifBlock.toString();
 	}
+
 }
 
 class whileNode implements RobotProgramNode{
+	private condNode cNode;
+	private RobotProgramNode whileBlock;
+
+	public whileNode(condNode cond, RobotProgramNode block){
+		this.cNode = cond;
+		this.whileBlock = block;
+	}
+
 	@Override
 	public void execute(Robot robot){
+		while (cNode.evaluate(robot)){
+			whileBlock.execute(robot);
+		}
+	}
 
+	public String toString(){
+		return "while"+"("+ cNode.toString()+ ")"+ whileBlock.toString();
 	}
 }
 
 class condNode implements RobotProgramNode{
 	private String relop;
-	private RobotProgramNode sensor;
-	private RobotProgramNode number;
+	private SensorNode sensor;
+	private int number;
 
-	public condNode(String rel, RobotProgramNode sen, RobotProgramNode num){
+	public condNode(String rel, SensorNode sen, int num){
 		this.relop = rel;
 		this.sensor = sen;
 		this.number = num;
 	}
 
 	@Override
-	public void execute(Robot robot){
+	public void execute(Robot robot){ }
 
+	public boolean evaluate(Robot robot){
+		if(relop == "lt"){
+			return (sensor.evaluate(robot) < this.number);
+		}
+		else if(relop =="gt"){
+			return (sensor.evaluate(robot) > this.number);
+		}
+		else if(relop =="eq"){
+			return (sensor.evaluate(robot) == this.number);
+		}
+		return false;
 	}
-}
 
-class relOPNode implements RobotProgramNode{
 	@Override
-	public void execute(Robot robot){
-
+	public String toString() {
+		return relop + "(" + sensor.toString()+ "," + Integer.toString(number) + ")";
 	}
-}
-
-class numNode implements RobotProgramNode{
-	private int value;
-	public numNode(int v){
-		this.value = v;
-	}
-	@Override
-	public void execute(Robot robot){}
-
-	public int evaluate(){return this.value;}
-
-	public String toString(){return ""+value;}
 }
 
 
@@ -160,6 +181,7 @@ class turnLnode implements RobotProgramNode{
 		robot.turnLeft();
 	}
 	public String toString(){ return "turnL;";}
+
 }
 
 class turnRnode implements RobotProgramNode{
@@ -193,6 +215,7 @@ class moveNode implements RobotProgramNode{
 		robot.move();
 	}
 	public String toString(){ return "move;";}
+
 }
 
 class waitNode implements RobotProgramNode{
@@ -204,6 +227,7 @@ class waitNode implements RobotProgramNode{
 		robot.idleWait();
 	}
 	public String toString(){ return "wait;";}
+
 }
 
 class turnAnode implements RobotProgramNode{
@@ -215,6 +239,7 @@ class turnAnode implements RobotProgramNode{
 		robot.turnAround();
 	}
 	public String toString(){ return "turnAround;";}
+
 }
 
 class shieldONnode implements RobotProgramNode{
@@ -226,6 +251,7 @@ class shieldONnode implements RobotProgramNode{
 		robot.setShield(true);
 	}
 	public String toString(){ return "shieldOn;";}
+
 }
 
 class shieldOFFnode implements RobotProgramNode{
@@ -237,11 +263,12 @@ class shieldOFFnode implements RobotProgramNode{
 		robot.setShield(false);
 	}
 	public String toString(){ return "shieldOff;";}
+
 }
 
 
 // Sensor Nodes - evaluate() function
-class fuelLnode implements RobotProgramNode{
+class fuelLnode extends SensorNode implements RobotProgramNode{
 
 	public fuelLnode(Scanner s){
 		s.next();
@@ -254,7 +281,7 @@ class fuelLnode implements RobotProgramNode{
 	public String toString(){ return "fuelLeft";}
 }
 
-class oppLRnode implements RobotProgramNode{
+class oppLRnode extends SensorNode implements RobotProgramNode{
 
 	public oppLRnode(Scanner s){
 		s.next();
@@ -267,7 +294,7 @@ class oppLRnode implements RobotProgramNode{
 	public String toString(){ return "oppLR";}
 }
 
-class oppFBnode implements RobotProgramNode{
+class oppFBnode extends SensorNode implements RobotProgramNode{
 
 	public oppFBnode(Scanner s){
 		s.next();
@@ -280,7 +307,7 @@ class oppFBnode implements RobotProgramNode{
 	public String toString(){ return "oppFB";}
 }
 
-class numBnode implements RobotProgramNode{
+class numBnode extends SensorNode implements RobotProgramNode{
 
 	public numBnode(Scanner s){
 		s.next();
@@ -293,7 +320,7 @@ class numBnode implements RobotProgramNode{
 	public String toString(){ return "numBarrels";}
 }
 
-class barLRnode implements RobotProgramNode{
+class barLRnode extends SensorNode implements RobotProgramNode{
 
 	public barLRnode(Scanner s){
 		s.next();
@@ -306,7 +333,7 @@ class barLRnode implements RobotProgramNode{
 	public String toString(){ return "barrelLR";}
 }
 
-class barFBnode implements RobotProgramNode{
+class barFBnode extends SensorNode implements RobotProgramNode{
 
 	public barFBnode(Scanner s){
 		s.next();
@@ -319,7 +346,7 @@ class barFBnode implements RobotProgramNode{
 	public String toString(){ return "barrelFB";}
 }
 
-class wallDnode implements RobotProgramNode{
+class wallDnode extends SensorNode implements RobotProgramNode{
 
 	public wallDnode(Scanner s){
 		s.next();

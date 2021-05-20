@@ -23,9 +23,9 @@ public class Parser {
 			// when one of them is one of (){},;
 			scan.useDelimiter("\\s+|(?=[{}(),;])|(?<=[{}(),;])");
 			// prints out program in raw text form
-			while(scan.hasNext()){
-				System.out.println(scan.next());
-			}
+//			while(scan.hasNext()){
+//				System.out.println(scan.next());
+//			}
 			RobotProgramNode n = parseProgram(scan); // You need to implement this!!!
 
 			scan.close();
@@ -113,8 +113,8 @@ public class Parser {
 		if(!s.hasNext()){return null;}
 		if(s.hasNext(actPat)) { returnNode = parseAct(s); }
 		else if (s.hasNext(loop)){ returnNode = parseLoop(s); }
-		else if (s.hasNext("if")){}
-		else if (s.hasNext("while")){}
+		else if (s.hasNext("if")){ returnNode = parseIf(s);}
+		else if (s.hasNext("while")){ returnNode = parseWhile(s);}
 		else {fail("Invalid statement", s);}
 
 		return returnNode;
@@ -165,7 +165,7 @@ public class Parser {
 
 	static RobotProgramNode parseIf(Scanner s) {
 		RobotProgramNode returnNode = null;
-		RobotProgramNode condN = null;
+		condNode condN = null;
 		RobotProgramNode blockN = null;
 
 		require("if","'If' Missing",s);
@@ -180,11 +180,26 @@ public class Parser {
 	}
 	//parse while loop
 
+	static RobotProgramNode parseWhile(Scanner s) {
+		RobotProgramNode returnNode = null;
+		condNode condN = null;
+		RobotProgramNode blockN = null;
+
+		require("while","'While' Missing",s);
+		require(OPENPAREN,"Missing '('",s);
+		condN = parseCond(s);
+		require(CLOSEPAREN,"Missing '('",s);
+		blockN = parseBlock(s);
+
+		returnNode = new whileNode(condN,blockN);
+
+		return returnNode;
+	}
 	//parse cond
-	static RobotProgramNode parseCond(Scanner s) {
+	static condNode parseCond(Scanner s) {
 		String relopN = null;
-		RobotProgramNode senN = null;
-		RobotProgramNode numN = null;
+		SensorNode senN = null;
+		int numN = 0;
 
 		if(s.hasNext(relOP)){relopN = s.next();}// RELOP
 		else{fail("RelOP missing",s);}
@@ -192,15 +207,15 @@ public class Parser {
 		if(s.hasNext(SENSOR)){senN = parseSen(s);}// SEN
 		else{fail("Invalid Sensor term",s);}
 		require(",", "Missing ','", s);// ,
-		if(s.hasNextInt()){numN = new numNode(s.nextInt());}// NUM
+		if(s.hasNextInt()){numN = s.nextInt();}// NUM
 		else{fail("Invalid number term",s);}
 		require(CLOSEPAREN, "Missing ')'", s);// )
 
 		return new condNode(relopN,senN,numN);
 	}
 	//parse Sensor
-	static RobotProgramNode parseSen( Scanner s) {
-		RobotProgramNode returnNode = null;
+	static SensorNode parseSen( Scanner s) {
+		SensorNode returnNode = null;
 		// Need to figure out how to distinguish between different acts and parse as correct node.
 		if(s.hasNext("fuelLeft")){returnNode = new fuelLnode(s);}
 		else if(s.hasNext("oppLR")){returnNode = new oppLRnode(s);}
@@ -214,9 +229,6 @@ public class Parser {
 
 		return returnNode;
 	}
-	//parse sensor
-
-	//parse num
 
 	// utility methods for the parser
 
