@@ -152,13 +152,17 @@ class condNode implements RobotProgramNode{
 	public void execute(Robot robot){ }
 
 	public boolean evaluate(Robot robot){
-		if(relop == "lt"){
+
+		if(relop.matches("lt")){
+
 			return (sensor.evaluate(robot) < this.number);
 		}
-		else if(relop =="gt"){
+		else if(relop.matches("gt")){
+
 			return (sensor.evaluate(robot) > this.number);
 		}
-		else if(relop =="eq"){
+		else if(relop.matches("eq")){
+
 			return (sensor.evaluate(robot) == this.number);
 		}
 		return false;
