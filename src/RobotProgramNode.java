@@ -174,6 +174,60 @@ class condNode implements RobotProgramNode{
 	}
 }
 
+class expNode implements RobotProgramNode{
+	private String opSign = null;
+	private expNode expN1;
+	private expNode expN2;
+	private int numb = Integer.MIN_VALUE;
+	private SensorNode sens;
+
+	public expNode(String op, expNode exp1, expNode exp2){
+		this.opSign = op;
+		this.expN1 = exp1;
+		this.expN2 = exp2;
+	}
+
+	public expNode(int n){this.numb = n;}
+
+	public expNode(SensorNode sn){this.sens = sn;}
+
+	@Override
+	public void execute(Robot robot){ }
+
+	public int evaluate(Robot robot){
+
+		if(opSign.matches("add")){
+			int result = expN1.evaluate(robot) + expN2.evaluate(robot);
+			return result;
+		}
+		else if(opSign.matches("sub")){
+			int result = expN1.evaluate(robot) - expN2.evaluate(robot);
+			return result;
+		}
+		else if(opSign.matches("mul")){
+			int result = expN1.evaluate(robot) * expN2.evaluate(robot);
+			return result;
+		}
+		else if(opSign.matches("div")) {
+			int result = expN1.evaluate(robot) / expN2.evaluate(robot);
+			return result;
+		}
+		else if(numb > Integer.MIN_VALUE){
+			return numb;
+		}
+
+		return sens.evaluate(robot);
+	}
+
+	@Override
+	public String toString() {
+		if(numb > Integer.MIN_VALUE){return Integer.toString(numb);}
+		else if(opSign.matches("add|sub|mul|div")){
+			return opSign + "(" + expN1.toString()+ "," + expN2.toString() + ")";
+		}
+		return sens.toString();
+	}
+}
 
 // Action nodes
 class turnLnode implements RobotProgramNode{

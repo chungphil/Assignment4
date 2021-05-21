@@ -89,6 +89,7 @@ public class Parser {
 	static Pattern loop = Pattern.compile("loop");
 	static Pattern SENSOR = Pattern.compile("fuelLeft|oppLR|oppFB|numBarrels|barrelLR|barrelFB|wallDist");
 	static Pattern relOP = Pattern.compile("lt|gt|eq");
+	static Pattern OP = Pattern.compile("add|sub|mul|div");
 
 
 	/**
@@ -157,7 +158,7 @@ public class Parser {
 			blockList.add(statement);
 		}
 		require(CLOSEBRACE, "Missing '}'", s);
-
+		if(!(blockList.size() > 0)){fail("Block is empty",s);}
 		return new blockNode(blockList);
 	}
 
@@ -195,7 +196,10 @@ public class Parser {
 
 		return returnNode;
 	}
-	//parse cond
+
+	static
+
+	//parse
 	static condNode parseCond(Scanner s) {
 		String relopN = null;
 		SensorNode senN = null;
