@@ -90,6 +90,7 @@ public class Parser {
 	static Pattern SENSOR = Pattern.compile("fuelLeft|oppLR|oppFB|numBarrels|barrelLR|barrelFB|wallDist");
 	static Pattern relOP = Pattern.compile("lt|gt|eq");
 	static Pattern OP = Pattern.compile("add|sub|mul|div");
+	static Pattern AON = Pattern.compile("and|or|not");
 
 
 	/**
@@ -204,6 +205,7 @@ public class Parser {
 		String relopN = null;
 		SensorNode senN = null;
 		int numN = 0;
+		condNode
 
 		if(s.hasNext(relOP)){relopN = s.next();}// RELOP
 		else{fail("RelOP missing",s);}

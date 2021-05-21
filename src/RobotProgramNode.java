@@ -139,13 +139,21 @@ class whileNode implements RobotProgramNode{
 
 class condNode implements RobotProgramNode{
 	private String relop;
-	private SensorNode sensor;
-	private int number;
+	private condNode Cnode1;
+	private condNode Cnode2;
+	private expNode Enode1;
+	private expNode Enode2;
 
-	public condNode(String rel, SensorNode sen, int num){
+	public condNode(String rel, expNode e1, expNode e2){
 		this.relop = rel;
-		this.sensor = sen;
-		this.number = num;
+		this.Enode1 = e1;
+		this.Enode2 = e2;
+	}
+
+	public condNode(String rel, condNode c1, condNode c2){
+		this.relop = rel;
+		this.Cnode1 = c1;
+		this.Cnode2 = c2;
 	}
 
 	@Override
@@ -155,22 +163,40 @@ class condNode implements RobotProgramNode{
 
 		if(relop.matches("lt")){
 
-			return (sensor.evaluate(robot) < this.number);
+			return (Enode1.evaluate(robot) < Enode2.evaluate(robot));
 		}
 		else if(relop.matches("gt")){
 
-			return (sensor.evaluate(robot) > this.number);
+			return (Enode1.evaluate(robot) > Enode2.evaluate(robot));
 		}
 		else if(relop.matches("eq")){
 
-			return (sensor.evaluate(robot) == this.number);
+			return (Enode1.evaluate(robot) == Enode2.evaluate(robot));
 		}
+		else if(relop.matches("and")){
+
+			return (Cnode1.evaluate(robot) == Cnode2.evaluate(robot));
+		}
+		else if(relop.matches("or")){
+
+			return (Cnode1.evaluate(robot) == Cnode2.evaluate(robot));
+		}
+		else if(relop.matches("not")){
+
+			return (!Cnode1.evaluate(robot));
+		}
+
 		return false;
 	}
 
 	@Override
 	public String toString() {
-		return relop + "(" + sensor.toString()+ "," + Integer.toString(number) + ")";
+		if(relop.matches("lt|gt|eq")){
+			return relop + "(" + Enode1.toString()+ "," + Enode2.toString() + ")";
+		} else if(relop.matches("and|or")){
+			return relop + "(" + Cnode1.toString() + "," + Cnode2.toString() + ")";
+		}
+		return relop + "(" + Cnode1.toString() + ")";
 	}
 }
 
