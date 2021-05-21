@@ -198,26 +198,59 @@ public class Parser {
 		return returnNode;
 	}
 
-	static
+	static expNode parseExp(Scanner s){
+		expNode returnNode = null;
+		// Need to figure out how to distinguish between different acts and parse as correct node.
+		if(s.hasNext(SENSOR)){
+			SensorNode senExp = parseSen(s);
+			returnNode = new expNode(senExp);
+		}
+		else if(s.hasNextInt()){returnNode = new expNode(s.nextInt());}
+		else if(s.hasNext(OP)){
+			String strOP = s.next();
+			require(OPENPAREN,"Missing '('",s);// (
+			expNode exp1 = parseExp(s);
+			require(",", "Missing ','", s);// ,
+			expNode exp2 = parseExp(s);
+			require(CLOSEPAREN, "Missing ')'", s);// )
+			returnNode = new expNode(strOP,exp1,exp2);
+		}
+		else {fail("Unknown or missing Sensor term",s);}
 
+		return returnNode;
+	}
 	//parse
 	static condNode parseCond(Scanner s) {
 		String relopN = null;
-		SensorNode senN = null;
-		int numN = 0;
-		condNode
+		condNode condReturn = null;
 
-		if(s.hasNext(relOP)){relopN = s.next();}// RELOP
-		else{fail("RelOP missing",s);}
-		require(OPENPAREN,"Missing '('",s);// (
-		if(s.hasNext(SENSOR)){senN = parseSen(s);}// SEN
-		else{fail("Invalid Sensor term",s);}
-		require(",", "Missing ','", s);// ,
-		if(s.hasNextInt()){numN = s.nextInt();}// NUM
-		else{fail("Invalid number term",s);}
-		require(CLOSEPAREN, "Missing ')'", s);// )
+		if(s.hasNext(relOP)){
+			relopN = s.next();
+			require(OPENPAREN,"Missing '('",s);// (
+			expNode exp1 = parseExp(s);
+			require(",", "Missing ','", s);// ,
+			expNode exp2 = parseExp(s);
+			require(CLOSEPAREN, "Missing ')'", s);// )
+			condReturn = new condNode(relopN,exp1,exp2);
+		}
+		else if(s.hasNext("and|or")){
+			relopN = s.next();
+			require(OPENPAREN,"Missing '('",s);// (
+			condNode cn1 = parseCond(s);
+			require(",", "Missing ','", s);// ,
+			condNode cn2 = parseCond(s);
+			require(CLOSEPAREN, "Missing ')'", s);// )
+			condReturn = new condNode(relopN,cn1,cn2);
+		}
+		else if(s.hasNext("not")){
+			relopN = s.next();
+			require(OPENPAREN,"Missing '('",s);// (
+			condNode cn1 = parseCond(s);
+			require(CLOSEPAREN, "Missing ')'", s);// )
+			condReturn = new condNode(relopN,cn1,cn1);
+		}else{fail("Operating Missing",s);}
 
-		return new condNode(relopN,senN,numN);
+		return condReturn;
 	}
 	//parse Sensor
 	static SensorNode parseSen( Scanner s) {
