@@ -182,11 +182,11 @@ class condNode implements RobotProgramNode{
 		}
 		else if(relop.matches("and")){
 
-			return (Cnode1.evaluate(robot) == Cnode2.evaluate(robot));
+			return (Cnode1.evaluate(robot) && Cnode2.evaluate(robot));
 		}
 		else if(relop.matches("or")){
 
-			return (Cnode1.evaluate(robot) == Cnode2.evaluate(robot));
+			return (Cnode1.evaluate(robot) || Cnode2.evaluate(robot));
 		}
 		else if(relop.matches("not")){
 
