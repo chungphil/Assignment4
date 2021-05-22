@@ -26,6 +26,9 @@ public class Parser {
 //			while(scan.hasNext()){
 //				System.out.println(scan.next());
 //			}
+			boolean test = Pattern.matches("(a|b|c)*d(e+)f","abbcccdef");
+			if(test){System.out.println("same");}
+
 			RobotProgramNode n = parseProgram(scan); // You need to implement this!!!
 
 			scan.close();
@@ -43,6 +46,7 @@ public class Parser {
 	/** For testing the parser without requiring the world */
 
 	public static void main(String[] args) {
+
 		if (args.length > 0) {
 			for (String arg : args) {
 				File f = new File(arg);

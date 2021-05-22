@@ -110,7 +110,9 @@ class ifNode implements RobotProgramNode{
 		if(cNode.evaluate(robot)){
 			ifBlock.execute(robot);
 		}else{
-			elseBlock.execute(robot);
+			if(elseBlock != null){
+					elseBlock.execute(robot);
+			}
 		}
 	}
 
