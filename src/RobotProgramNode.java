@@ -97,21 +97,28 @@ class loopNode implements RobotProgramNode{
 class ifNode implements RobotProgramNode{
 	private condNode cNode;
 	private RobotProgramNode ifBlock;
+	private RobotProgramNode elseBlock;
 
-	public ifNode(condNode cond, RobotProgramNode block){
+	public ifNode(condNode cond, RobotProgramNode block, RobotProgramNode eblock){
 		this.cNode = cond;
 		this.ifBlock = block;
+		this.elseBlock = eblock;
 	}
 
 	@Override
 	public void execute(Robot robot){
 		if(cNode.evaluate(robot)){
 			ifBlock.execute(robot);
+		}else{
+			elseBlock.execute(robot);
 		}
 	}
 
 	public String toString(){
-		return "if"+"("+ cNode.toString()+ ")"+ ifBlock.toString();
+		String ifStr = "if"+"("+ cNode.toString()+ ")"+ ifBlock.toString();
+		if(elseBlock != null)
+			ifStr += "else" + elseBlock.toString();
+		return ifStr;
 	}
 
 }
@@ -201,7 +208,7 @@ class condNode implements RobotProgramNode{
 }
 
 class expNode implements RobotProgramNode{
-	private String opSign = null;
+	private String opSign;
 	private expNode expN1;
 	private expNode expN2;
 	private int numb = Integer.MIN_VALUE;
@@ -213,9 +220,9 @@ class expNode implements RobotProgramNode{
 		this.expN2 = exp2;
 	}
 
-	public expNode(int n){this.numb = n;}
+	public expNode(int n){this.numb = n; this.opSign = "";}
 
-	public expNode(SensorNode sn){this.sens = sn;}
+	public expNode(SensorNode sn){this.sens = sn; this.opSign = "";}
 
 	@Override
 	public void execute(Robot robot){ }
@@ -291,26 +298,53 @@ class takeFnode implements RobotProgramNode{
 }
 
 class moveNode implements RobotProgramNode{
+	private expNode exp= null;
 
-	public moveNode(Scanner s){
+	public moveNode(Scanner s,expNode e){
 		s.next();
+		this.exp = e;
 	}
 	public void execute(Robot robot){
+		if(exp != null){
+			int nmove = exp.evaluate(robot);
+			for(int i = 1;i <nmove; i++){
+				robot.move();
+			}
+		}
 		robot.move();
 	}
-	public String toString(){ return "move;";}
+	public String toString(){
+		String moveexp = "move";
+		if(exp != null){
+			moveexp += ("(" + exp.toString() + ")");
+		}
+		return moveexp + ";";
+	}
 
 }
 
 class waitNode implements RobotProgramNode{
-
-	public waitNode(Scanner s){
+	private expNode exp = null;
+	public waitNode(Scanner s, expNode e){
 		s.next();
+		this.exp = e;
 	}
 	public void execute(Robot robot){
+		if(exp != null){
+			int nwait = exp.evaluate(robot);
+			for(int i = 1;i <nwait; i++){
+				robot.idleWait();
+			}
+		}
 		robot.idleWait();
 	}
-	public String toString(){ return "wait;";}
+	public String toString(){
+		String waitexp = "wait";
+		if(exp != null){
+			waitexp += ("(" + exp.toString() + ")");
+		}
+		return waitexp + ";";
+	}
 
 }
 

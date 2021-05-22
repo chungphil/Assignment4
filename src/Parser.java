@@ -125,11 +125,29 @@ public class Parser {
 	static RobotProgramNode parseAct( Scanner s) {
 		RobotProgramNode returnNode = null;
 		// Need to figure out how to distinguish between different acts and parse as correct node.
-		if(s.hasNext("move")){returnNode = new moveNode(s);}
+		if(s.hasNext("move")){
+			returnNode = new moveNode(s,null);
+			if(s.hasNext("\\(")){
+				s.next(); //open par
+				expNode EN = parseExp(s);
+				if(s.hasNext("\\)")){
+					returnNode = new moveNode(s, EN);
+				}else{fail("Missing ')'",s);}
+			}
+		}
+		else if(s.hasNext("wait")){
+			returnNode = new waitNode(s,null);
+			if(s.hasNext("\\(")){
+				s.next(); //eat open par
+				expNode EN = parseExp(s);
+				if(s.hasNext("\\)")){
+					returnNode = new waitNode(s, EN);
+				}else{fail("Missing ')'",s);}
+			}
+		}
 		else if(s.hasNext("turnL")){returnNode = new turnLnode(s);}
 		else if(s.hasNext("turnR")){returnNode = new turnRnode(s);}
 		else if(s.hasNext("takeFuel")){returnNode = new takeFnode(s);}
-		else if(s.hasNext("wait")){returnNode = new waitNode(s);}
 		else if(s.hasNext("turnAround")){returnNode = new turnAnode(s);}
 		else if(s.hasNext("shieldOn")){returnNode = new shieldONnode(s);}
 		else if(s.hasNext("shieldOff")){returnNode = new shieldOFFnode(s);}
@@ -169,14 +187,19 @@ public class Parser {
 		RobotProgramNode returnNode = null;
 		condNode condN = null;
 		RobotProgramNode blockN = null;
+		RobotProgramNode eBlock = null;
 
 		require("if","'If' Missing",s);
 		require(OPENPAREN,"Missing '('",s);
 		condN = parseCond(s);
-		require(CLOSEPAREN,"Missing '('",s);
+		require(CLOSEPAREN,"Missing ')'",s);
 		blockN = parseBlock(s);
+		if(s.hasNext("else")){
+			s.next(); //eat "else"
+			eBlock = parseBlock(s);
+		}
 
-		returnNode = new ifNode(condN,blockN);
+		returnNode = new ifNode(condN,blockN,eBlock);
 
 		return returnNode;
 	}
